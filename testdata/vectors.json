@@ -1,0 +1,190 @@
+{
+  "description": "EIP-712 test vectors from various implementations",
+  "vectors": [
+    {
+      "name": "Basic Mail Example (from EIP-712 spec)",
+      "domain": {
+        "name": "Ether Mail",
+        "version": "1",
+        "chainId": 1,
+        "verifyingContract": "0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC"
+      },
+      "types": {
+        "Person": [
+          {"name": "name", "type": "string"},
+          {"name": "wallet", "type": "address"}
+        ],
+        "Mail": [
+          {"name": "from", "type": "Person"},
+          {"name": "to", "type": "Person"},
+          {"name": "contents", "type": "string"}
+        ]
+      },
+      "primaryType": "Mail",
+      "message": {
+        "from": {
+          "name": "Cow",
+          "wallet": "0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826"
+        },
+        "to": {
+          "name": "Bob",
+          "wallet": "0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB"
+        },
+        "contents": "Hello, Bob!"
+      },
+      "expectedHash": "0xbe609aee343fb3c4b28e1df9e632fca64fcfaede20f02e86244efddf30957bd2",
+      "signature": {
+        "r": "0x4355c47d63924e8a72e509b65029052eb6c299d53a04e167c5775fd466751c9d",
+        "s": "0x07299936d304c153f6443dfa05f40ff007d72911b6f72307f996231605b91562",
+        "v": 28
+      },
+      "signerAddress": "0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826"
+    },
+    {
+      "name": "Simple Message",
+      "domain": {
+        "name": "Test App",
+        "version": "1",
+        "chainId": 1
+      },
+      "types": {
+        "Message": [
+          {"name": "text", "type": "string"}
+        ]
+      },
+      "primaryType": "Message",
+      "message": {
+        "text": "Hello, EIP-712!"
+      }
+    },
+    {
+      "name": "EIP-2612 Permit Example",
+      "domain": {
+        "name": "USD Coin",
+        "version": "2",
+        "chainId": 1,
+        "verifyingContract": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+      },
+      "types": {
+        "Permit": [
+          {"name": "owner", "type": "address"},
+          {"name": "spender", "type": "address"},
+          {"name": "value", "type": "uint256"},
+          {"name": "nonce", "type": "uint256"},
+          {"name": "deadline", "type": "uint256"}
+        ]
+      },
+      "primaryType": "Permit",
+      "message": {
+        "owner": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+        "spender": "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
+        "value": "1000000000000000000",
+        "nonce": "0",
+        "deadline": "1893456000"
+      }
+    },
+    {
+      "name": "Complex Nested Types",
+      "domain": {
+        "name": "Complex App",
+        "version": "1",
+        "chainId": 1
+      },
+      "types": {
+        "Part": [
+          {"name": "id", "type": "uint256"},
+          {"name": "name", "type": "string"}
+        ],
+        "Product": [
+          {"name": "name", "type": "string"},
+          {"name": "parts", "type": "Part[]"}
+        ],
+        "Order": [
+          {"name": "orderId", "type": "uint256"},
+          {"name": "products", "type": "Product[]"},
+          {"name": "customer", "type": "address"}
+        ]
+      },
+      "primaryType": "Order",
+      "message": {
+        "orderId": "12345",
+        "products": [
+          {
+            "name": "Widget",
+            "parts": [
+              {"id": "1", "name": "Part A"},
+              {"id": "2", "name": "Part B"}
+            ]
+          },
+          {
+            "name": "Gadget",
+            "parts": [
+              {"id": "3", "name": "Part C"}
+            ]
+          }
+        ],
+        "customer": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"
+      }
+    },
+    {
+      "name": "All Primitive Types",
+      "domain": {
+        "name": "Type Test",
+        "version": "1",
+        "chainId": 1
+      },
+      "types": {
+        "AllTypes": [
+          {"name": "boolValue", "type": "bool"},
+          {"name": "stringValue", "type": "string"},
+          {"name": "addressValue", "type": "address"},
+          {"name": "bytes32Value", "type": "bytes32"},
+          {"name": "uint8Value", "type": "uint8"},
+          {"name": "uint256Value", "type": "uint256"},
+          {"name": "int256Value", "type": "int256"}
+        ]
+      },
+      "primaryType": "AllTypes",
+      "message": {
+        "boolValue": true,
+        "stringValue": "test string",
+        "addressValue": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+        "bytes32Value": "0x0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+        "uint8Value": "255",
+        "uint256Value": "1234567890",
+        "int256Value": "-9876543210"
+      }
+    },
+    {
+      "name": "Empty Message",
+      "domain": {
+        "name": "Empty Test",
+        "version": "1",
+        "chainId": 1
+      },
+      "types": {
+        "Empty": []
+      },
+      "primaryType": "Empty",
+      "message": {}
+    },
+    {
+      "name": "Domain with Salt",
+      "domain": {
+        "name": "Salt Test",
+        "version": "1",
+        "chainId": 1,
+        "salt": "0x0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
+      },
+      "types": {
+        "Message": [
+          {"name": "content", "type": "string"}
+        ]
+      },
+      "primaryType": "Message",
+      "message": {
+        "content": "Test with salt"
+      }
+    }
+  ]
+}

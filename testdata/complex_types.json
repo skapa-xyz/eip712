@@ -1,0 +1,180 @@
+{
+  "description": "Complex type definitions for testing edge cases",
+  "examples": [
+    {
+      "name": "Deeply Nested Structure",
+      "types": {
+        "Attribute": [
+          {"name": "key", "type": "string"},
+          {"name": "value", "type": "string"}
+        ],
+        "Metadata": [
+          {"name": "attributes", "type": "Attribute[]"},
+          {"name": "timestamp", "type": "uint256"}
+        ],
+        "SubItem": [
+          {"name": "id", "type": "bytes32"},
+          {"name": "metadata", "type": "Metadata"}
+        ],
+        "Item": [
+          {"name": "name", "type": "string"},
+          {"name": "subItems", "type": "SubItem[]"}
+        ],
+        "Collection": [
+          {"name": "owner", "type": "address"},
+          {"name": "items", "type": "Item[]"},
+          {"name": "totalValue", "type": "uint256"}
+        ]
+      },
+      "primaryType": "Collection",
+      "message": {
+        "owner": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+        "items": [
+          {
+            "name": "Item 1",
+            "subItems": [
+              {
+                "id": "0x0000000000000000000000000000000000000000000000000000000000000001",
+                "metadata": {
+                  "attributes": [
+                    {"key": "color", "value": "red"},
+                    {"key": "size", "value": "large"}
+                  ],
+                  "timestamp": "1234567890"
+                }
+              }
+            ]
+          }
+        ],
+        "totalValue": "1000000000000000000"
+      }
+    },
+    {
+      "name": "Recursive Structure",
+      "types": {
+        "TreeNode": [
+          {"name": "value", "type": "uint256"},
+          {"name": "left", "type": "TreeNode"},
+          {"name": "right", "type": "TreeNode"}
+        ],
+        "BinaryTree": [
+          {"name": "root", "type": "TreeNode"},
+          {"name": "size", "type": "uint256"}
+        ]
+      },
+      "primaryType": "BinaryTree",
+      "note": "This would require special handling as it's truly recursive"
+    },
+    {
+      "name": "Maximum Complexity",
+      "types": {
+        "ByteArrays": [
+          {"name": "bytes1Val", "type": "bytes1"},
+          {"name": "bytes2Val", "type": "bytes2"},
+          {"name": "bytes4Val", "type": "bytes4"},
+          {"name": "bytes8Val", "type": "bytes8"},
+          {"name": "bytes16Val", "type": "bytes16"},
+          {"name": "bytes32Val", "type": "bytes32"},
+          {"name": "dynamicBytes", "type": "bytes"}
+        ],
+        "NumberArrays": [
+          {"name": "uint8Array", "type": "uint8[]"},
+          {"name": "uint256Array", "type": "uint256[]"},
+          {"name": "int256Array", "type": "int256[]"},
+          {"name": "fixedUintArray", "type": "uint256[5]"}
+        ],
+        "ComplexArrays": [
+          {"name": "addressArray", "type": "address[]"},
+          {"name": "boolArray", "type": "bool[]"},
+          {"name": "stringArray", "type": "string[]"},
+          {"name": "bytes32Array", "type": "bytes32[]"}
+        ],
+        "AllTypes": [
+          {"name": "byteData", "type": "ByteArrays"},
+          {"name": "numberData", "type": "NumberArrays"},
+          {"name": "complexData", "type": "ComplexArrays"},
+          {"name": "signature", "type": "bytes"},
+          {"name": "deadline", "type": "uint256"}
+        ]
+      },
+      "primaryType": "AllTypes"
+    },
+    {
+      "name": "Multi-dimensional Arrays",
+      "types": {
+        "Matrix": [
+          {"name": "rows", "type": "uint256[][]"},
+          {"name": "name", "type": "string"}
+        ],
+        "Tensor": [
+          {"name": "data", "type": "uint256[][][]"},
+          {"name": "dimensions", "type": "uint256[]"}
+        ]
+      },
+      "primaryType": "Matrix",
+      "note": "Multi-dimensional arrays testing"
+    },
+    {
+      "name": "Protocol Example - DEX Order",
+      "types": {
+        "TokenPair": [
+          {"name": "tokenA", "type": "address"},
+          {"name": "tokenB", "type": "address"}
+        ],
+        "OrderDetails": [
+          {"name": "price", "type": "uint256"},
+          {"name": "amount", "type": "uint256"},
+          {"name": "isBuyOrder", "type": "bool"}
+        ],
+        "Order": [
+          {"name": "trader", "type": "address"},
+          {"name": "pair", "type": "TokenPair"},
+          {"name": "details", "type": "OrderDetails"},
+          {"name": "expires", "type": "uint256"},
+          {"name": "nonce", "type": "uint256"},
+          {"name": "signature", "type": "bytes"}
+        ]
+      },
+      "primaryType": "Order"
+    },
+    {
+      "name": "Edge Case - Empty Types",
+      "types": {
+        "Empty": [],
+        "ContainsEmpty": [
+          {"name": "empty", "type": "Empty"},
+          {"name": "value", "type": "uint256"}
+        ]
+      },
+      "primaryType": "ContainsEmpty"
+    },
+    {
+      "name": "Edge Case - Single Field Types",
+      "types": {
+        "SingleString": [{"name": "value", "type": "string"}],
+        "SingleAddress": [{"name": "addr", "type": "address"}],
+        "SingleBool": [{"name": "flag", "type": "bool"}],
+        "Wrapper": [
+          {"name": "str", "type": "SingleString"},
+          {"name": "addr", "type": "SingleAddress"},
+          {"name": "bool", "type": "SingleBool"}
+        ]
+      },
+      "primaryType": "Wrapper"
+    },
+    {
+      "name": "Special Characters in Field Names",
+      "types": {
+        "SpecialFields": [
+          {"name": "normal_field", "type": "string"},
+          {"name": "field_with_underscores", "type": "uint256"},
+          {"name": "fieldWithCamelCase", "type": "address"},
+          {"name": "FIELD_WITH_CAPS", "type": "bool"},
+          {"name": "field123WithNumbers", "type": "bytes32"}
+        ]
+      },
+      "primaryType": "SpecialFields",
+      "note": "Testing various naming conventions"
+    }
+  ]
+}

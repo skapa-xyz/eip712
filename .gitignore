@@ -1,0 +1,151 @@
+# Dependencies
+node_modules/
+vendor/
+.venv/
+venv/
+env/
+ENV/
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+
+# Build outputs
+build/
+dist/
+out/
+target/
+*.so
+*.dylib
+*.dll
+*.exe
+*.out
+*.app
+*.dSYM/
+*.su
+*.idb
+*.pdb
+
+# Foundry/Forge
+cache/
+broadcast/
+deployments/
+!deployments/.gitkeep
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*.swn
+*.bak
+*.tmp
+*~
+.DS_Store
+Thumbs.db
+
+# Environment files - CRITICAL: Never commit these
+.env
+.env.*
+!.env.example
+!.env.sample
+*.env
+local.env
+prod.env
+production.env
+development.env
+staging.env
+test.env
+
+# Security - NEVER commit these
+*.pem
+*.key
+*.cert
+*.crt
+*.p12
+*.pfx
+private.key
+private.pem
+secrets/
+.secrets/
+id_rsa*
+id_dsa*
+id_ecdsa*
+id_ed25519*
+*_private_key*
+*_secret*
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+
+# Test coverage
+coverage/
+*.cover
+*.coverage
+.coverage
+.coverage.*
+.cache
+.pytest_cache/
+htmlcov/
+.tox/
+.nox/
+coverage.xml
+*.coverprofile
+coverage.html
+coverage.out
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Desktop.ini
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.backup
+*.old
+*.orig
+*.rej
+.*.sw[a-z]
+*~
+
+# Go
+*.test
+*.prof
+*.pprof
+*.trace
+go.work
+
+# Python
+*.egg-info/
+.eggs/
+develop-eggs/
+pip-log.txt
+pip-delete-this-directory.txt
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# JavaScript/TypeScript
+.npm
+.eslintcache
+*.tsbuildinfo
+.parcel-cache
+
+# Foundry out directory
+contracts/out/*
+!contracts/out/.gitkeep
+
+# Claude
+.claude/*
