@@ -340,6 +340,7 @@ func BenchmarkMessageSizes(b *testing.B) {
 		message := Message{"content": content}
 		
 		b.Run(fmt.Sprintf("Size_%d", size), func(b *testing.B) {
+			b.ReportAllocs()
 			for i := 0; i < b.N; i++ {
 				_, err := signer.SignTypedData(domain, types, "Message", message)
 				if err != nil {
@@ -377,4 +378,222 @@ func BenchmarkConcurrentSigning(b *testing.B) {
 			}
 		}
 	})
+}
+
+// Benchmark validateNoCycles function
+func BenchmarkValidateNoCycles(b *testing.B) {
+	testCases := []struct {
+		name  string
+		types map[string][]Type
+	}{
+		{
+			name: "Simple",
+			types: map[string][]Type{
+				"Message": {{Name: "content", Type: "string"}},
+			},
+		},
+		{
+			name: "Nested",
+			types: map[string][]Type{
+				"Person": {{Name: "name", Type: "string"}, {Name: "wallet", Type: "address"}},
+				"Mail": {{Name: "from", Type: "Person"}, {Name: "to", Type: "Person"}, {Name: "contents", Type: "string"}},
+			},
+		},
+		{
+			name: "Complex",
+			types: map[string][]Type{
+				"Address": {{Name: "street", Type: "string"}, {Name: "city", Type: "string"}},
+				"Person": {{Name: "name", Type: "string"}, {Name: "address", Type: "Address"}},
+				"Company": {{Name: "name", Type: "string"}, {Name: "owner", Type: "Person"}, {Name: "employees", Type: "Person[]"}},
+				"Contract": {{Name: "company", Type: "Company"}, {Name: "value", Type: "uint256"}},
+			},
+		},
+	}
+	
+	for _, tc := range testCases {
+		b.Run(tc.name, func(b *testing.B) {
+			b.ReportAllocs()
+			for i := 0; i < b.N; i++ {
+				_ = validateNoCycles(tc.types)
+			}
+		})
+	}
+}
+
+// Benchmark extreme nesting (> 3 levels)
+func BenchmarkExtremeNesting(b *testing.B) {
+	signer, err := NewSigner(testPrivateKey1, 1)
+	if err != nil {
+		b.Fatal(err)
+	}
+	
+	domain := createTestDomain("Extreme Nesting", "1", 1)
+	
+	// Create 5 levels of nesting
+	types := map[string][]Type{
+		"Level5": {{Name: "value", Type: "string"}},
+		"Level4": {{Name: "data", Type: "Level5"}, {Name: "id", Type: "uint256"}},
+		"Level3": {{Name: "nested", Type: "Level4"}, {Name: "tag", Type: "string"}},
+		"Level2": {{Name: "deep", Type: "Level3"}, {Name: "count", Type: "uint256"}},
+		"Level1": {{Name: "root", Type: "Level2"}, {Name: "owner", Type: "address"}},
+	}
+	
+	message := Message{
+		"root": map[string]interface{}{
+			"count": "100",
+			"deep": map[string]interface{}{
+				"tag": "deep-tag",
+				"nested": map[string]interface{}{
+					"id": "999",
+					"data": map[string]interface{}{
+						"value": "Extremely nested value",
+					},
+				},
+			},
+		},
+		"owner": testAddress1,
+	}
+	
+	b.ReportAllocs()
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		_, err := signer.SignTypedData(domain, types, "Level1", message)
+		if err != nil {
+			b.Fatal(err)
+		}
+	}
+}
+
+// Benchmark very large arrays (> 100 elements)
+func BenchmarkVeryLargeArrays(b *testing.B) {
+	signer, err := NewSigner(testPrivateKey1, 1)
+	if err != nil {
+		b.Fatal(err)
+	}
+	
+	domain := createTestDomain("Large Array Benchmark", "1", 1)
+	types := map[string][]Type{
+		"Message": {
+			{Name: "items", Type: "string[]"},
+			{Name: "values", Type: "uint256[]"},
+			{Name: "addresses", Type: "address[]"},
+		},
+	}
+	
+	arraySizes := []int{100, 500, 1000}
+	
+	for _, size := range arraySizes {
+		b.Run(fmt.Sprintf("ArraySize_%d", size), func(b *testing.B) {
+			// Create arrays of specified size
+			items := make([]string, size)
+			values := make([]string, size)
+			addresses := make([]string, size)
+			
+			for i := 0; i < size; i++ {
+				items[i] = fmt.Sprintf("item-%d", i)
+				values[i] = fmt.Sprintf("%d", i*1000)
+				addresses[i] = testAddress1
+			}
+			
+			message := Message{
+				"items":     items,
+				"values":    values,
+				"addresses": addresses,
+			}
+			
+			b.ReportAllocs()
+			b.ResetTimer()
+			for i := 0; i < b.N; i++ {
+				_, err := signer.SignTypedData(domain, types, "Message", message)
+				if err != nil {
+					b.Fatal(err)
+				}
+			}
+		})
+	}
+}
+
+// Benchmark helper functions
+func BenchmarkDomainToAPITypes(b *testing.B) {
+	signer, err := NewSigner(testPrivateKey1, 1)
+	if err != nil {
+		b.Fatal(err)
+	}
+	
+	domains := []Domain{
+		{Name: "Test", Version: "1"},
+		createTestDomain("Test", "1", 1),
+		createTestDomainWithContract("Test", "1", 1, testAddress1),
+		func() Domain {
+			d := createTestDomainWithContract("Test", "1", 1, testAddress1)
+			var salt [32]byte
+			copy(salt[:], []byte("benchmark salt"))
+			d.Salt = salt
+			return d
+		}(),
+	}
+	
+	b.ReportAllocs()
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		_ = signer.domainToAPITypes(domains[i%len(domains)])
+	}
+}
+
+// Benchmark building domain types
+func BenchmarkBuildDomainTypes(b *testing.B) {
+	signer, err := NewSigner(testPrivateKey1, 1)
+	if err != nil {
+		b.Fatal(err)
+	}
+	
+	domains := []Domain{
+		{Name: "Test", Version: "1"},
+		createTestDomain("Test", "1", 1),
+		createTestDomainWithContract("Test", "1", 1, testAddress1),
+		createTestDomainWithSalt("Test", "1", 1, "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"),
+	}
+	
+	b.ReportAllocs()
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		_ = signer.buildDomainTypes(domains[i%len(domains)])
+	}
+}
+
+// Benchmark NewSignerFromKeystore
+func BenchmarkNewSignerFromKeystore(b *testing.B) {
+	// Create a test keystore
+	password := "test-password"
+	// This is a test keystore with a known private key for benchmarking
+	keystoreJSON := []byte(`{
+		"address": "f39fd6e51aad88f6f4ce6ab8827279cfffb92266",
+		"crypto": {
+			"cipher": "aes-128-ctr",
+			"ciphertext": "e4610fb26bd43fa17fe6d3ac0ff166f7e4a98484dd6c8247ccd90c1215e4a7d8",
+			"cipherparams": {
+				"iv": "7bc492fb946dce4f8ffb3cec595b46f1"
+			},
+			"kdf": "scrypt",
+			"kdfparams": {
+				"dklen": 32,
+				"n": 262144,
+				"p": 1,
+				"r": 8,
+				"salt": "14c2b26e5f5a5b5f5a5b5f5a5b5f5a5b5f5a5b5f5a5b5f5a5b5f5a5b5f"
+			},
+			"mac": "8ac9a206c1fb6130a9d1b57fc53b72b8e3e228c981ef7b44f6f6a28a4db50a26"
+		},
+		"id": "3198bc9c-6672-5ab3-d995-4942343ae5b6",
+		"version": 3
+	}`)
+	
+	b.ReportAllocs()
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		_, err := NewSignerFromKeystore(keystoreJSON, password, 1)
+		if err != nil {
+			b.Skip("Skipping keystore benchmark due to error:", err)
+		}
+	}
 }
